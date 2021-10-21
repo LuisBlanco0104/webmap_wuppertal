@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="data/Gemeinde_Wuppertal_2.js"></script>
+        <script src="data/Street_Infrastructure_Wuppertal_3.js"></script>
+        <script src="data/GeogridCensus2011Buildingage_4.js"></script>
+        <script src="data/Buildings_Wuppertal_age_class_5.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+        }
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:10
+        }).fitBounds([[51.13083512899638,6.993748917862948],[51.3999247985688,7.326993051573643]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+            map.setMaxBounds(map.getBounds());
+        }
+        map.createPane('pane_BasemapDarkmode_0');
+        map.getPane('pane_BasemapDarkmode_0').style.zIndex = 400;
+        var layer_BasemapDarkmode_0 = L.tileLayer('https://a.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png', {
+            pane: 'pane_BasemapDarkmode_0',
+            opacity: 0.95,
+            attribution: '',
+            minZoom: 10,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 30
+        });
+        layer_BasemapDarkmode_0;
+        map.addLayer(layer_BasemapDarkmode_0);
+        map.createPane('pane_BasemapLightmode_1');
+        map.getPane('pane_BasemapLightmode_1').style.zIndex = 401;
+        var layer_BasemapLightmode_1 = L.tileLayer('https://a.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}@2x.png', {
+            pane: 'pane_BasemapLightmode_1',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 10,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 18
+        });
+        layer_BasemapLightmode_1;
+        function pop_Gemeinde_Wuppertal_2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['STADT'] !== null ? autolinker.link(feature.properties['STADT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FLAECHE'] !== null ? autolinker.link(feature.properties['FLAECHE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_Gemeinde_Wuppertal_2_0() {
+            return {
+                pane: 'pane_Gemeinde_Wuppertal_2',
+                opacity: 1,
+                color: 'rgba(255,1,94,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 3.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(190,178,151,0.0)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_Gemeinde_Wuppertal_2');
+        map.getPane('pane_Gemeinde_Wuppertal_2').style.zIndex = 402;
+        map.getPane('pane_Gemeinde_Wuppertal_2').style['mix-blend-mode'] = 'normal';
+        var layer_Gemeinde_Wuppertal_2 = new L.geoJson(json_Gemeinde_Wuppertal_2, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Gemeinde_Wuppertal_2',
+            layerName: 'layer_Gemeinde_Wuppertal_2',
+            pane: 'pane_Gemeinde_Wuppertal_2',
+            onEachFeature: pop_Gemeinde_Wuppertal_2,
+            style: style_Gemeinde_Wuppertal_2_0,
+        });
+        bounds_group.addLayer(layer_Gemeinde_Wuppertal_2);
+        map.addLayer(layer_Gemeinde_Wuppertal_2);
+        function pop_Street_Infrastructure_Wuppertal_3(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['osm_id'] !== null ? autolinker.link(feature.properties['osm_id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['name'] !== null ? autolinker.link(feature.properties['name'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['type'] !== null ? autolinker.link(feature.properties['type'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['other_tags'] !== null ? autolinker.link(feature.properties['other_tags'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_Street_Infrastructure_Wuppertal_3_0() {
+            return {
+                pane: 'pane_Street_Infrastructure_Wuppertal_3',
+                opacity: 1,
+                color: 'rgba(255,255,255,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+        }
+        map.createPane('pane_Street_Infrastructure_Wuppertal_3');
+        map.getPane('pane_Street_Infrastructure_Wuppertal_3').style.zIndex = 403;
+        map.getPane('pane_Street_Infrastructure_Wuppertal_3').style['mix-blend-mode'] = 'normal';
+        var layer_Street_Infrastructure_Wuppertal_3 = new L.geoJson(json_Street_Infrastructure_Wuppertal_3, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Street_Infrastructure_Wuppertal_3',
+            layerName: 'layer_Street_Infrastructure_Wuppertal_3',
+            pane: 'pane_Street_Infrastructure_Wuppertal_3',
+            onEachFeature: pop_Street_Infrastructure_Wuppertal_3,
+            style: style_Street_Infrastructure_Wuppertal_3_0,
+        });
+        bounds_group.addLayer(layer_Street_Infrastructure_Wuppertal_3);
+        map.addLayer(layer_Street_Infrastructure_Wuppertal_3);
+        function pop_GeogridCensus2011Buildingage_4(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Gitter_ID_100m'] !== null ? autolinker.link(feature.properties['Gitter_ID_100m'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ags'] !== null ? autolinker.link(feature.properties['ags'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Building_age_Code'] !== null ? autolinker.link(feature.properties['Building_age_Code'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Building_age_Text'] !== null ? autolinker.link(feature.properties['Building_age_Text'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Anzahl'] !== null ? autolinker.link(feature.properties['Anzahl'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Building_age_Acc'] !== null ? autolinker.link(feature.properties['Building_age_Acc'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_GeogridCensus2011Buildingage_4_0(feature) {
+            switch(String(feature.properties['Building_age_Code'])) {
+                case '1':
+                    return {
+                pane: 'pane_GeogridCensus2011Buildingage_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(43,131,186,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '2':
+                    return {
+                pane: 'pane_GeogridCensus2011Buildingage_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(100,171,176,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '3':
+                    return {
+                pane: 'pane_GeogridCensus2011Buildingage_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(157,211,167,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '4':
+                    return {
+                pane: 'pane_GeogridCensus2011Buildingage_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(199,233,173,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '5':
+                    return {
+                pane: 'pane_GeogridCensus2011Buildingage_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(237,248,185,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '6':
+                    return {
+                pane: 'pane_GeogridCensus2011Buildingage_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,237,170,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '7':
+                    return {
+                pane: 'pane_GeogridCensus2011Buildingage_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(254,201,128,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '8':
+                    return {
+                pane: 'pane_GeogridCensus2011Buildingage_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(249,158,89,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '9':
+                    return {
+                pane: 'pane_GeogridCensus2011Buildingage_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(232,91,58,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '10':
+                    return {
+                pane: 'pane_GeogridCensus2011Buildingage_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(215,25,28,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'NULL':
+                    return {
+                pane: 'pane_GeogridCensus2011Buildingage_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,158,23,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_GeogridCensus2011Buildingage_4');
+        map.getPane('pane_GeogridCensus2011Buildingage_4').style.zIndex = 404;
+        map.getPane('pane_GeogridCensus2011Buildingage_4').style['mix-blend-mode'] = 'normal';
+        var layer_GeogridCensus2011Buildingage_4 = new L.geoJson(json_GeogridCensus2011Buildingage_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_GeogridCensus2011Buildingage_4',
+            layerName: 'layer_GeogridCensus2011Buildingage_4',
+            pane: 'pane_GeogridCensus2011Buildingage_4',
+            onEachFeature: pop_GeogridCensus2011Buildingage_4,
+            style: style_GeogridCensus2011Buildingage_4_0,
+        });
+        bounds_group.addLayer(layer_GeogridCensus2011Buildingage_4);
+        map.addLayer(layer_GeogridCensus2011Buildingage_4);
+        function pop_Buildings_Wuppertal_age_class_5(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Building_id'] !== null ? autolinker.link(feature.properties['Building_id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['GEB_TYP'] !== null ? autolinker.link(feature.properties['GEB_TYP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Area m2'] !== null ? autolinker.link(feature.properties['Area m2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BAUJAHR'] !== null ? autolinker.link(feature.properties['BAUJAHR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BAUJAHR_KL'] !== null ? autolinker.link(feature.properties['BAUJAHR_KL'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_Buildings_Wuppertal_age_class_5_0(feature) {
+            switch(String(feature.properties['BAUJAHR_KL'])) {
+                default:
+                    return {
+                pane: 'pane_Buildings_Wuppertal_age_class_5',
+                opacity: 1,
+                color: 'rgba(255,255,255,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,1,94,0.0)',
+                interactive: true,
+            }
+                    break;
+                case '1':
+                    return {
+                pane: 'pane_Buildings_Wuppertal_age_class_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(43,131,186,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '2':
+                    return {
+                pane: 'pane_Buildings_Wuppertal_age_class_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(100,171,176,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '3':
+                    return {
+                pane: 'pane_Buildings_Wuppertal_age_class_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(157,211,167,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '4':
+                    return {
+                pane: 'pane_Buildings_Wuppertal_age_class_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(199,233,173,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '5':
+                    return {
+                pane: 'pane_Buildings_Wuppertal_age_class_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(237,248,185,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '6':
+                    return {
+                pane: 'pane_Buildings_Wuppertal_age_class_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,237,170,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '7':
+                    return {
+                pane: 'pane_Buildings_Wuppertal_age_class_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(254,201,128,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '8':
+                    return {
+                pane: 'pane_Buildings_Wuppertal_age_class_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(249,158,89,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '9':
+                    return {
+                pane: 'pane_Buildings_Wuppertal_age_class_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(232,91,58,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '10':
+                    return {
+                pane: 'pane_Buildings_Wuppertal_age_class_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(215,25,28,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Buildings_Wuppertal_age_class_5');
+        map.getPane('pane_Buildings_Wuppertal_age_class_5').style.zIndex = 405;
+        map.getPane('pane_Buildings_Wuppertal_age_class_5').style['mix-blend-mode'] = 'normal';
+        var layer_Buildings_Wuppertal_age_class_5 = new L.geoJson(json_Buildings_Wuppertal_age_class_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Buildings_Wuppertal_age_class_5',
+            layerName: 'layer_Buildings_Wuppertal_age_class_5',
+            pane: 'pane_Buildings_Wuppertal_age_class_5',
+            onEachFeature: pop_Buildings_Wuppertal_age_class_5,
+            style: style_Buildings_Wuppertal_age_class_5_0,
+        });
+        bounds_group.addLayer(layer_Buildings_Wuppertal_age_class_5);
+        map.addLayer(layer_Buildings_Wuppertal_age_class_5);
+        var osmGeocoder = new L.Control.Geocoder({
+            collapsed: true,
+            position: 'topleft',
+            text: 'Search',
+            title: 'Testing'
+        }).addTo(map);
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .className += ' fa fa-search';
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .title += 'Search for a place';
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'Buildings_Wuppertal_age_class<br /><table><tr><td style="text-align: center;"><img src="legend/Buildings_Wuppertal_age_class_5_Novalue0.png" /></td><td>No value</td></tr><tr><td style="text-align: center;"><img src="legend/Buildings_Wuppertal_age_class_5_11.png" /></td><td>1</td></tr><tr><td style="text-align: center;"><img src="legend/Buildings_Wuppertal_age_class_5_22.png" /></td><td>2</td></tr><tr><td style="text-align: center;"><img src="legend/Buildings_Wuppertal_age_class_5_33.png" /></td><td>3</td></tr><tr><td style="text-align: center;"><img src="legend/Buildings_Wuppertal_age_class_5_44.png" /></td><td>4</td></tr><tr><td style="text-align: center;"><img src="legend/Buildings_Wuppertal_age_class_5_55.png" /></td><td>5</td></tr><tr><td style="text-align: center;"><img src="legend/Buildings_Wuppertal_age_class_5_66.png" /></td><td>6</td></tr><tr><td style="text-align: center;"><img src="legend/Buildings_Wuppertal_age_class_5_77.png" /></td><td>7</td></tr><tr><td style="text-align: center;"><img src="legend/Buildings_Wuppertal_age_class_5_88.png" /></td><td>8</td></tr><tr><td style="text-align: center;"><img src="legend/Buildings_Wuppertal_age_class_5_99.png" /></td><td>9</td></tr><tr><td style="text-align: center;"><img src="legend/Buildings_Wuppertal_age_class_5_1010.png" /></td><td>10</td></tr></table>': layer_Buildings_Wuppertal_age_class_5,'Geogrid Census 2011 Building age<br /><table><tr><td style="text-align: center;"><img src="legend/GeogridCensus2011Buildingage_4_10.png" /></td><td>1</td></tr><tr><td style="text-align: center;"><img src="legend/GeogridCensus2011Buildingage_4_21.png" /></td><td>2</td></tr><tr><td style="text-align: center;"><img src="legend/GeogridCensus2011Buildingage_4_32.png" /></td><td>3</td></tr><tr><td style="text-align: center;"><img src="legend/GeogridCensus2011Buildingage_4_43.png" /></td><td>4</td></tr><tr><td style="text-align: center;"><img src="legend/GeogridCensus2011Buildingage_4_54.png" /></td><td>5</td></tr><tr><td style="text-align: center;"><img src="legend/GeogridCensus2011Buildingage_4_65.png" /></td><td>6</td></tr><tr><td style="text-align: center;"><img src="legend/GeogridCensus2011Buildingage_4_76.png" /></td><td>7</td></tr><tr><td style="text-align: center;"><img src="legend/GeogridCensus2011Buildingage_4_87.png" /></td><td>8</td></tr><tr><td style="text-align: center;"><img src="legend/GeogridCensus2011Buildingage_4_98.png" /></td><td>9</td></tr><tr><td style="text-align: center;"><img src="legend/GeogridCensus2011Buildingage_4_109.png" /></td><td>10</td></tr><tr><td style="text-align: center;"><img src="legend/GeogridCensus2011Buildingage_4_10.png" /></td><td></td></tr></table>': layer_GeogridCensus2011Buildingage_4,'<img src="legend/Street_Infrastructure_Wuppertal_3.png" /> Street_Infrastructure_Wuppertal': layer_Street_Infrastructure_Wuppertal_3,'<img src="legend/Gemeinde_Wuppertal_2.png" /> Gemeinde_Wuppertal': layer_Gemeinde_Wuppertal_2,"Basemap Lightmode": layer_BasemapLightmode_1,"Basemap Darkmode": layer_BasemapDarkmode_0,}).addTo(map);
+        setBounds();
+        </script>
+    </body>
+</html>
